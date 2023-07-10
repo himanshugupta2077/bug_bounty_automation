@@ -1,0 +1,25 @@
+[global_config]
+  window_state = maximise
+  suppress_multiple_term_dialog = True
+[keybindings]
+  split_horiz = <Primary>underscore
+  split_vert = <Primary>bar
+[profiles]
+  [[default]]
+    background_darkness = 1.0
+    background_type = transparent
+    cursor_shape = ibeam
+    font = Fira Code Medium 14
+    scrollback_infinite = True
+    palette = "#1f2229:#d41919:#5ebdab:#fea44c:#367bf0:#9755b3:#49aee6:#e6e6e6:#198388:#ec0101:#47d4b9:#ff8a18:#277fff:#962ac3:#05a1f7:#ffffff"
+    use_system_font = False
+    use_theme_colors = True
+[layouts]
+  [[default]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+[plugins]

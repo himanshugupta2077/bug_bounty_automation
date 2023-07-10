@@ -29,15 +29,10 @@ color_light_cyan='\e[1;36m'
 color_light_grey='\e[0;37m'
 color_white='\e[1;37m'
 
-# nuke impacket function launch_code generator
-launch_codes_alpha=$(echo $((1 + RANDOM % 9999)))
-launch_codes_beta=$(echo $((1 + RANDOM % 9999)))
-launch_codes_charlie=$(echo $((1 + RANDOM % 9999)))
-
 # status indicators
 blueplus='\e[0;34m[++]\e[0m'
 greenplus='\e[1;32m[++]\e[0m'
-greenminus='\e[1;33m[--]\e[0m'
+yellowminus='\e[1;33m[--]\e[0m'
 redminus='\e[1;31m[--]\e[0m'
 redexclaim='\e[1;31m[!!]\e[0m'
 redstar='\e[1;31m[**]\e[0m'
@@ -51,7 +46,7 @@ CURRENT_LOCATION=$(pwd)
 CURRENT_USER=$(logname)
 
 # package folder to download packages to install
-PACKAGE_FOLDER="/home/{$CURRENT_USER}/Downloads/"
+PACKAGE_FOLDER="/home/$CURRENT_USER/Downloads/"
 
 # system architecture
 archtype=$(uname -m)
@@ -65,8 +60,8 @@ fi
 
 check_for_root() {
     if [ "$EUID" -ne 0 ]; then 
-    	echo -e "\n$redexclaim Script must be run with root"
-        echo -e "$redexclaim exiting"
+    	echo -e "\n  $redexclaim Script must be run with root"
+        echo -e "  $redexclaim exiting"
     	exit
     fi
     }
@@ -74,8 +69,13 @@ check_for_root() {
 check_linux_distribution() {
     distro=$(uname -a | grep -i -c "kali") # distro check
     if [ $distro -ne 1 ]; then
-        echo -e "\n $blinkexclaim Kali Linux Not Detected - WSL/WSL2/Anything else is unsupported $blinkexclaim \n"; exit 
+        echo -e "\n  $redexclaim Kali Linux Not Detected - WSL/WSL2/Anything else is unsupported\n"; exit 
+        echo -e "  $redexclaim exiting"
     fi
+    }
+
+line() {
+    echo -e "\n---------------------------------------------------------------------------------------------"
     }
 
 show_system_info() {
@@ -103,17 +103,17 @@ apt_autoremove() {
 change_keyboard_shortcuts() {
 	# create copy of original file
     echo -e "\n  $greenplus changing keyboard shortcuts \n"
-	cp /home/${CURRENT_USER}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml ${CURRENT_LOCATION}/xfce4-keyboard-shortcuts-backup.xml
+	cp /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts-backup.xml
 	exit_status1=$?
-	echo "backed up /home/${CURRENT_USER}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml to ${CURRENT_LOCATION}/xfce4-keyboard-shortcuts-backup.xml"
 
 	# replace original file by configured one
-	cp ${CURRENT_LOCATION}/configured-xfce4-keyboard-shortcuts.xml /home/${CURRENT_USER}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+	cp $CURRENT_LOCATION/config-files/configured-xfce4-keyboard-shortcuts.xml /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
 	exit_status2=$?
 
 	if [ $exit_status1 -eq 0 ] && [ $exit_status2 -eq 0 ]; then
-        echo -e "replaced /home/${CURRENT_USER}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml with ${CURRENT_LOCATION}/configured-xfce4-keyboard-shortcuts.xml"
-        echo -e "\n  $blueplus log out and log in again for the keyboard shortcuts to work"
+        echo -e "replaced /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml with $CURRENT_LOCATION/config-files/configured-xfce4-keyboard-shortcuts.xml"
+        echo -e "\n  $blueplus restart the machine for the keyboard shortcuts to work"
+        echo -e "\n  $blueplus to restore the original file, run: \ncp /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts-backup.xml /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml"
     fi
     }
 
@@ -124,7 +124,7 @@ add_user_to_vboxsf() {
 
     if [ $findgroup = 1 ]
         then
-        echo -e "user is already a member of vboxsf group"
+        echo -e "  $blueplus user is already a member of vboxsf group"
     else
         eval adduser $CURRENT_USER vboxsf
         echo -e "\n  $greenplus fix applied : virtualbox permission denied on shared folder"
@@ -133,24 +133,24 @@ add_user_to_vboxsf() {
     }
 
 install_sublime_text() {
-    echo -e "\n  $greenplus installing sublime-text \n"
-    if dpkg -s "sublime-text" >/dev/null 2>&1; then
-        echo "sublime-text already installed"
+    echo -e "\n  $greenplus looking for sublime-text \n"
+    if subl -v >/dev/null 2>&1; then
+        echo -e "  $blueplus sublime-text already installed"
     else
-        echo "sublime-text is not installed"
-        echo "installing sublime-text"
+        echo -e "  $yellowminus sublime-text is not installed"
+        echo -e "\n  $greenplus installing sublime-text \n"
 
-        if [ -e "/${PACKAGE_FOLDER}/sublime-text_build-4143_amd64.deb" ]; then
-            eval sudo dpkg -i ${PACKAGE_FOLDER}/sublime-text_build-4143_amd64.deb    
+        if [ -e "/$PACKAGE_FOLDER/sublime-text_build-4143_amd64.deb" ]; then
+            eval sudo dpkg -i $PACKAGE_FOLDER/sublime-text_build-4143_amd64.deb    
         else
-            eval wget -P ${PACKAGE_FOLDER} https://download.sublimetext.com/sublime-text_build-4143_amd64.deb    
-            eval sudo dpkg -i ${PACKAGE_FOLDER}/sublime-text_build-4143_amd64.deb
+            eval wget -P $PACKAGE_FOLDER https://download.sublimetext.com/sublime-text_build-4143_amd64.deb    
+            eval sudo dpkg -i $PACKAGE_FOLDER/sublime-text_build-4143_amd64.deb
         fi
 
         if dpkg -s "sublime-text" >/dev/null 2>&1; then
-            echo "sublime-text installed"
+            echo -e "\n  $blueplus sublime-text installed"
         else 
-            echo unable to install sublime-text
+            echo -e "  $redexclaim unable to install sublime-text"
             exit
         fi
     fi
@@ -160,35 +160,102 @@ install_terminator() {
 
     APPLICATION_NAME="terminator"
 
-    echo -e "\n  $greenplus installing $APPLICATION_NAME \n"
-    if dpkg -s "$APPLICATION_NAME" >/dev/null 2>&1; then
-        echo "$APPLICATION_NAME already installed"
+    echo -e "\n  $greenplus looking for $APPLICATION_NAME \n"
+    if terminator -v >/dev/null 2>&1; then
+        echo -e "  $blueplus $APPLICATION_NAME already installed"
     else
-        echo "$APPLICATION_NAME is not installed"
-        echo "installing $APPLICATION_NAME\n"
+        echo -e "  $yellowminus $APPLICATION_NAME is not installed \n"
+        echo -e "  $greenplus installing $APPLICATION_NAME\n"
 
         eval sudo apt install $APPLICATION_NAME -y
 
-        if dpkg -s "$APPLICATION_NAME" >/dev/null 2>&1; then
-            echo "\n$APPLICATION_NAME installed"
+        if terminator -v >/dev/null 2>&1; then
+            echo -e "\n  $blueplus $APPLICATION_NAME installed"
         else 
-            echo unable to install $APPLICATION_NAME
+            echo -e "  $redexclaim unable to install $APPLICATION_NAME"
             exit
         fi
     fi
     }
 
+set_terminator_to_default() {
+    # Check if Terminator is installed
+    if ! command -v terminator &> /dev/null; then
+        echo -e "terminator is not installed"
+        exit 1
+    fi
+
+    echo -e "\n  $greenplus changing default terminal emulator to terminator"
+
+    helpers_file="/home/$CURRENT_USER/.config/xfce4/helpers.rc"
+    terminal_line="TerminalEmulator=terminator"
+
+    # Check if helpers.rc file exists
+    if [ -f "$helpers_file" ]; then
+      # Check if the terminal line exists in the file
+      if grep -q "$terminal_line" "$helpers_file"; then
+        echo -e "\n  $blueplus terminator is already set to default terminal emulator"
+      else
+        # Check if any TerminalEmulator line exists
+        if grep -q "TerminalEmulator=" "$helpers_file"; then
+          # Replace the existing TerminalEmulator line with terminator
+          sed -i "s/TerminalEmulator=.*/$terminal_line/" "$helpers_file"
+          echo -e "\n  $blueplus default terminal emulator is set to terminator"
+        else
+          # Add the TerminalEmulator line at the end of the file
+          echo -e "$terminal_line" >> "$helpers_file"
+          echo -e "\n  $blueplus default terminal emulator is set to terminator"
+        fi
+      fi
+    else
+      # Create the helpers.rc file and add the TerminalEmulator line
+      echo "$terminal_line" > "$helpers_file"
+      echo -e "\n  $blueplus default terminal emulator is set to terminator"
+    fi
+    }
+
+add_terminator_config() { 
+    # Check if Terminator is installed
+    if ! command -v terminator &> /dev/null; then
+        echo -e "terminator is not installed"
+        exit 1
+    fi
+
+    echo -e "\n  $greenplus adding terminator config file"
+
+    if ! [ -d "/home/$CURRENT_USER/.config/terminator/" ]; then
+        mkdir -p /home/$CURRENT_USER/.config/terminator/
+    fi
+
+    cp $CURRENT_LOCATION/config-files/terminator-config /home/$CURRENT_USER/.config/terminator/config
+    chown -R kali /home/$CURRENT_USER/.config/terminator/
+    echo -e "\n  $blueplus added terminator config file in /home/$CURRENT_USER/.config/terminator/config"
+}
+
 check_for_root
 check_linux_distribution
 show_system_info
+line
 sleep 1
-# apt_update
-# apt_upgrade
-# apt_autoremove
+echo -e "\n  $blueplus updating machine"
+apt_update
+apt_upgrade
+apt_autoremove
+line
 change_keyboard_shortcuts
+line
 sleep 1
 add_user_to_vboxsf
+line
 sleep 1
 install_sublime_text
 sleep 1
+line
 install_terminator
+line
+sleep 1
+set_terminator_to_default
+line
+sleep 1
+add_terminator_config
+line
