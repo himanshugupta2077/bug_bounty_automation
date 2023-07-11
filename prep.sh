@@ -48,29 +48,11 @@ CURRENT_USER=$(logname)
 # package folder to download packages to install
 PACKAGE_FOLDER="/home/$CURRENT_USER/Downloads/"
 
-# system architecture
-archtype=$(uname -m)
-if [ "$archtype" == "aarch64" ]; then
-	SYSTEM_ARCH="arm64"
-fi
-
-if [ "$archtype" == "x86_64" ]; then
-	SYSTEM_ARCH="amd64"
-fi
-
 check_for_root() {
     if [ "$EUID" -ne 0 ]; then 
-    	echo -e "\n  $redexclaim Script must be run with root"
+        echo -e "\n  $redexclaim Script must be run with root"
         echo -e "  $redexclaim exiting"
-    	exit
-    fi
-    }
-
-check_linux_distribution() {
-    distro=$(uname -a | grep -i -c "kali") # distro check
-    if [ $distro -ne 1 ]; then
-        echo -e "\n  $redexclaim Kali Linux Not Detected - WSL/WSL2/Anything else is unsupported\n"; exit 
-        echo -e "  $redexclaim exiting"
+        exit
     fi
     }
 
@@ -101,19 +83,19 @@ apt_autoremove() {
     }
 
 change_keyboard_shortcuts() {
-	# create copy of original file
+    # create copy of original file
     echo -e "\n  $greenplus changing keyboard shortcuts \n"
-	cp /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts-backup.xml
-	exit_status1=$?
+    cp /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts-backup.xml
+    exit_status1=$?
 
-	# replace original file by configured one
-	cp $CURRENT_LOCATION/config-files/configured-xfce4-keyboard-shortcuts.xml /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
-	exit_status2=$?
+    # replace original file by configured one
+    cp $CURRENT_LOCATION/config-files/configured-xfce4-keyboard-shortcuts.xml /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+    exit_status2=$?
 
-	if [ $exit_status1 -eq 0 ] && [ $exit_status2 -eq 0 ]; then
+    if [ $exit_status1 -eq 0 ] && [ $exit_status2 -eq 0 ]; then
         echo -e "replaced /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml with $CURRENT_LOCATION/config-files/configured-xfce4-keyboard-shortcuts.xml"
         echo -e "\n  $blueplus restart the machine for the keyboard shortcuts to work"
-        echo -e "\n  $blueplus to restore the original file, run: \ncp /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts-backup.xml /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml"
+        echo -e "\n  $blueplus to restore the original file, run: \n\ncp /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts-backup.xml /home/$CURRENT_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml"
     fi
     }
 
@@ -230,10 +212,40 @@ add_terminator_config() {
     cp $CURRENT_LOCATION/config-files/terminator-config /home/$CURRENT_USER/.config/terminator/config
     chown -R kali /home/$CURRENT_USER/.config/terminator/
     echo -e "\n  $blueplus added terminator config file in /home/$CURRENT_USER/.config/terminator/config"
-}
+    }
+
+install_mongodb() {
+
+    APPLICATION_NAME="mongodb"
+
+    echo -e "\n  $greenplus looking for $APPLICATION_NAME \n"
+    if mongod --version >/dev/null 2>&1; then
+        echo -e "  $blueplus $APPLICATION_NAME already installed"
+        echo -e "\n  $blueplus to start mongodb run: \n\nsudo systemctl enable mongodb\nsudo service mongodb start"
+        echo -e "\n  $blueplus to check mongodb status run: \n\nsudo systemctl status mongodb"
+    else
+        echo -e "  $yellowminus $APPLICATION_NAME is not installed \n"
+        echo -e "  $greenplus installing $APPLICATION_NAME\n"
+
+        eval sudo apt install $APPLICATION_NAME -y
+
+        if mongod --version >/dev/null 2>&1; then
+            echo -e "\n  $blueplus $APPLICATION_NAME installed"
+            echo -e "\n  $blueplus to start mongodb run: \n\nsudo service mongodb start\nsudo systemctl enable mongodb"
+            echo -e "\n  $blueplus to check mongodb status run: \n\nsudo systemctl status mongodb"
+        else 
+            echo -e "  $redexclaim unable to install $APPLICATION_NAME"
+            exit
+        fi
+    fi
+    }
+
+bye_bye() {
+    echo -e "\n  $blueplus restart the machine for all the changes to take place"
+    echo -e "\n  $blueplus bye!"
+    }
 
 check_for_root
-check_linux_distribution
 show_system_info
 line
 sleep 1
@@ -248,9 +260,9 @@ sleep 1
 add_user_to_vboxsf
 line
 sleep 1
-install_sublime_text
-sleep 1
-line
+# install_sublime_text
+# sleep 1
+# line
 install_terminator
 line
 sleep 1
@@ -258,4 +270,10 @@ set_terminator_to_default
 line
 sleep 1
 add_terminator_config
+line
+sleep 1
+install_mongodb
+line
+sleep 1
+bye_bye
 line
