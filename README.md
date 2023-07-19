@@ -1,5 +1,5 @@
 # customizing_kali
-Creating a shell script that can be run after a fresh Kali install to tweak it as per personal preference. Inspired by pimpmykali from Dewalt-arch. (https://github.com/Dewalt-arch/pimpmykali)
+Creating a shell script that can be run after a fresh Kali install to tweak it as per personal preference. Inspired by pimpmykali from Dewalt-arch. (https://github.com/Dewalt-arch/pimpmykali) After that it will start running recon tools, save the ouput in txt and then will be added in the mongodb.
 
 ## workflow
 
