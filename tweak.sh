@@ -297,12 +297,12 @@ bye_bye() {
 
 check_for_root
 show_system_info
-# echo -e "\n$blueinfo updating machine"
+echo -e "\n$blueinfo updating machine"
 # apt_update
 # apt_upgrade
 # apt_autoremove
 ask_for_adding_new_user
-# change_keyboard_shortcuts
+change_keyboard_shortcuts
 # install_sublime_text
 # install_terminator
 # set_terminator_to_default

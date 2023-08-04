@@ -19,9 +19,9 @@ line() {
 # if not started 
 
 echo -e "\n$greenplus starting database "
-sudo service mongodb start
-echo -e "\n$greenplus installing pymongo "
-python -m pip install pymongo
+sudo systemctl start mongod
+# echo -e "\n$greenplus installing pymongo "
+# python -m pip install pymongo
 
 # echo -e "\n$greenplus creating database user 'ronin' "
 
