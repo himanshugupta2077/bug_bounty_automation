@@ -1,3 +1,4 @@
-ipv4 = 34.26.18.124
-domain = www.foss.com
-creation_time = 2023-07-18_10:16
+target: 
+ipv4: 
+creation_time: 
+last_updated: 

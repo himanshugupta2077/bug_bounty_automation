@@ -2,7 +2,9 @@
 import os
 import subprocess
 import time
+import importlib
 from colorama import init, Fore, Style
+import sys
 
 # Initialize colorama
 init(autoreset=True)
@@ -32,41 +34,50 @@ except OSError:
 PACKAGE_FOLDER = f"/home/{CURRENT_USER}/Downloads/"
 
 def line():
-    print("\n---------------------------------------------------------------------------------------------")
+    print("\n----------------------------------------------------------------------------------------------------------------")
+
+def logo():
+    print("""
+   ___                 ___                   _             _         _                        _   _             
+  / __\_   _  __ _    / __\ ___  _   _ _ __ | |_ _   _    /_\  _   _| |_ ___  _ __ ___   __ _| |_(_) ___  _ __  
+ /__\// | | |/ _` |  /__\/// _ \| | | | '_ \| __| | | |  //_ \| | | | __/ _ \| '_ ` _ \ / _` | __| |/ _ \| '_ \ 
+/ \/  \ |_| | (_| | / \/  \ (_) | |_| | | | | |_| |_| | /  _  \ |_| | || (_) | | | | | | (_| | |_| | (_) | | | |
+\_____/\__,_|\__, | \_____/\___/ \__,_|_| |_|\__|\__, | \_/ \_/\__,_|\__\___/|_| |_| |_|\__,_|\__|_|\___/|_| |_|
+             |___/                               |___/                                                          
+
+----------------------------------------------------------------------------------------------------------------
+""")
 
 def show_system_info():
-    print(f"\n{blueinfo} system info \n")
-    print(f"user: {CURRENT_USER}")
-    print(f"working directory: {CURRENT_LOCATION}")
+    print(f"{blueinfo} System Info \n")
+    print(f"Current User: {CURRENT_USER}")
+    print(f"Working Directory: {CURRENT_LOCATION}")
     time.sleep(0.5)
-    line()
 
 def apt_update():
-    print(f"\n{greenplus} running: sudo apt update \n")
+    print(f"\n{greenplus} Updating System \n")
+    # print(f"\n{greenplus} running: sudo apt update \n")
     subprocess.run(["sudo", "apt", "-y", "update", "-o", "Dpkg::Progress-Fancy=1"], check=True)
 
 def apt_upgrade():
-    print(f"\n{greenplus} running: sudo apt upgrade \n")
+    # print(f"\n{greenplus} running: sudo apt upgrade \n")
     subprocess.run(["sudo", "apt", "-y", "upgrade", "-o", "Dpkg::Progress-Fancy=1"], check=True)
 
 def apt_autoremove():
-    print(f"\n{greenplus} running: sudo apt autoremove \n")
+    # print(f"\n{greenplus} running: sudo apt autoremove \n")
     subprocess.run(["sudo", "apt", "-y", "autoremove", "-o", "Dpkg::Progress-Fancy=1"], check=True)
-    line()
 
 def install_mongodb():
     APPLICATION_NAME = "mongodb"
-    print(f"\n{greenplus} looking for {APPLICATION_NAME} \n")
     try:
         subprocess.run(["which", "mongod"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-        print(f"{blueinfo} {APPLICATION_NAME} already installed")
+        print(f"\n{blueinfo} MongoDB already installed. Skipping Installation.")
     except subprocess.CalledProcessError:
-        print(f"{yellowminus} {APPLICATION_NAME} is not installed \n")
-        print(f"{greenplus} installing {APPLICATION_NAME}\n")
+        print(f"\n{yellowminus} MongoDB not found. Installing MongoDB.\n")
         try:
             subprocess.run(["sudo", "apt", "install", APPLICATION_NAME, "-y"], check=True)
             subprocess.run(["which", "mongod"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-            print(f"\n{blueinfo} {APPLICATION_NAME} installed")
+            print(f"\n{blueinfo} MongoDB successfully installed.")
         except subprocess.CalledProcessError:
-            print(f"{redexclaim} unable to install {APPLICATION_NAME}")
+            print(f"{redexclaim} Unable to install MongoDB.")
             exit()
