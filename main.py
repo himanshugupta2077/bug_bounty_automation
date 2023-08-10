@@ -20,9 +20,9 @@ def main(target, target_info_string):
 	# SYSTEM TWEAKING
 	tweak_mod.logo()
 	tweak_mod.show_system_info()
-	# tweak_mod.apt_update()
-	# tweak_mod.apt_upgrade()
-	# tweak_mod.apt_autoremove()
+	tweak_mod.apt_update()
+	tweak_mod.apt_upgrade()
+	tweak_mod.apt_autoremove()
 	tweak_mod.install_mongodb()
 
 	# DATABASE TWEAKING

@@ -55,27 +55,43 @@ def show_system_info():
     time.sleep(0.5)
 
 def apt_update():
-    print(f"\n{greenplus} Updating System \n")
-    # print(f"\n{greenplus} running: sudo apt update \n")
-    subprocess.run(["sudo", "apt", "-y", "update", "-o", "Dpkg::Progress-Fancy=1"], check=True)
+    print(f"\n{greenplus} Updating System... \n")
+    # print(f"{greenplus} running: sudo apt update \n")
+    command = "sudo apt update > /dev/null 2>&1"
+    try:
+        subprocess.run(command, shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print("Error:", e)
 
 def apt_upgrade():
-    # print(f"\n{greenplus} running: sudo apt upgrade \n")
-    subprocess.run(["sudo", "apt", "-y", "upgrade", "-o", "Dpkg::Progress-Fancy=1"], check=True)
+    # print(f"{greenplus} running: sudo apt upgrade \n")
+    command = "sudo apt -y upgrade > /dev/null 2>&1"
+    try:
+        subprocess.run(command, shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print("Error:", e)
+
 
 def apt_autoremove():
     # print(f"\n{greenplus} running: sudo apt autoremove \n")
-    subprocess.run(["sudo", "apt", "-y", "autoremove", "-o", "Dpkg::Progress-Fancy=1"], check=True)
+    command = "sudo apt -y autoremove > /dev/null 2>&1"
+    try:
+        subprocess.run(command, shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print("Error:", e)
 
 def install_mongodb():
-    APPLICATION_NAME = "mongodb"
     try:
         subprocess.run(["which", "mongod"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         print(f"\n{blueinfo} MongoDB already installed. Skipping Installation.")
     except subprocess.CalledProcessError:
         print(f"\n{yellowminus} MongoDB not found. Installing MongoDB...\n")
         try:
-            subprocess.run(["sudo", "apt", "install", APPLICATION_NAME, "-y"], check=True)
+            command = "sudo apt install mongodb > /dev/null 2>&1"
+            try:
+                subprocess.run(command, shell=True, check=True)
+            except subprocess.CalledProcessError as e:
+                print("Error:", e)
             subprocess.run(["which", "mongod"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             print(f"\n{blueinfo} MongoDB successfully installed.")
         except subprocess.CalledProcessError:
