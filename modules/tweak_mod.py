@@ -73,7 +73,7 @@ def install_mongodb():
         subprocess.run(["which", "mongod"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         print(f"\n{blueinfo} MongoDB already installed. Skipping Installation.")
     except subprocess.CalledProcessError:
-        print(f"\n{yellowminus} MongoDB not found. Installing MongoDB.\n")
+        print(f"\n{yellowminus} MongoDB not found. Installing MongoDB...\n")
         try:
             subprocess.run(["sudo", "apt", "install", APPLICATION_NAME, "-y"], check=True)
             subprocess.run(["which", "mongod"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)

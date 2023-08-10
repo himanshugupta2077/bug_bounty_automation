@@ -1,13 +1,23 @@
 #!/bin/bash
 
-domain=$1
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <domain>"
+    exit 1
+fi
 
-ping -c 4 domain
+domain="$1"
 
-dig domain
+echo "Pinging $domain:"
+ping -c 4 "$domain"
 
-traceroute domain
+echo "Digging $domain:"
+dig +short "$domain"
 
-nslookup domain
+echo "Traceroute to $domain:"
+traceroute "$domain"
 
-whois domain
+echo "Nslookup for $domain:"
+nslookup "$domain"
+
+echo "Whois information for $domain:"
+whois "$domain"

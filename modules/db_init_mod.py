@@ -18,7 +18,7 @@ redexclaim = f"{Fore.RED}[!]{Style.RESET_ALL}"
 def line():
 	print("\n----------------------------------------------------------------------------------------------------------------")
 
-def is_mongodb_running():
+def is_mongodb_service_running():
 	try:
 		# Run the "sudo systemctl status mongod" command and capture the output
 		result = subprocess.run(["sudo", "systemctl", "status", "mongodb"], capture_output=True, text=True)
@@ -34,7 +34,7 @@ def is_mongodb_running():
 		# Handle any exceptions that might occur during the subprocess execution
 		return False
 
-def start_mongodb():
+def start_mongodb_service():
 	try:
 		# Run the "sudo systemctl start mongod" command
 		print(f"\n{blueinfo} Initializing Database...")
@@ -51,19 +51,6 @@ def init_db():
 	client = pymongo.MongoClient("mongodb://localhost:27017/")
 	db = client["ronindb"]
 
-	# Create/select a collection within the database
-	collection = db['mycollection']
-
-	# Dummy data for the document
-	dummy_data = {
-		'name': 'John Doe',
-		'age': 30,
-		'email': 'john@example.com'
-	}
-
-	# Insert the dummy data document into the collection
-	collection.insert_one(dummy_data).inserted_id
-	
 	return client, db
 
 def database_info(client, database_names):
@@ -85,8 +72,8 @@ def database_info(client, database_names):
 
 	return client, db
 
-def init_mongodb():
-	if is_mongodb_running():
+def init_mongodb_service():
+	if is_mongodb_service_running():
 		pass
 	else:
-		start_mongodb()
+		start_mongodb_service()

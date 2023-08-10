@@ -85,7 +85,7 @@ def main():
     elif args.file:
         target, target_info_string = parse_multiple_targets(args.file)
     else:
-        print(f"\n{redexclaim} No target given")
+        print(f"\n{redexclaim} Error: No target given. Please provide a target.")
         print("\nusage: main.py [-h] [-t TARGET] [-f FILE]")
         print("""
 options:
