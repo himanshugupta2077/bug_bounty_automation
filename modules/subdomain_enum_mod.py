@@ -66,8 +66,7 @@ def find_alive(current_path, domain_name):
     # source: https://infosecwriteups.com/story-of-my-first-valid-critical-bug-22029115f8d7
 
     cmd = f"cat {sorted_file} | httpx > {output_file_path_alive}"
-
-    output = subprocess.run(cmd, shell=True)
+    subprocess.run(cmd, shell=True)
 
     filename = f"{current_path}" + "/" + f"{domain_name}" + "/3_alive.txt"
 
@@ -77,16 +76,18 @@ def find_alive(current_path, domain_name):
     num_lines = len(lines)
     print("[+] Alive subdomains found:", num_lines)
 
-def main(args):
+    return filename
+
+def main(target):
     current_path = os.getcwd()
-    if not os.path.exists(args.domain):
-        os.makedirs(args.domain)
+    if not os.path.exists(target):
+        os.makedirs(target)
 
     current_path = os.getcwd()
-    if not os.path.exists(args.domain + "/tool_output"):
-        os.makedirs(args.domain + "/tool_output")
+    if not os.path.exists(target + "/tool_output"):
+        os.makedirs(target + "/tool_output")
 
-    domain_name = args.domain
+    domain_name = target
     output_file_path = f"{current_path}" + "/" + f"{domain_name}" + "/1_found.txt"
     tool_output_file_path = f"{current_path}" + "/" + f"{domain_name}" + "/tool_output"
 
@@ -94,10 +95,6 @@ def main(args):
     subfinder_runner(tool_output_file_path, domain_name, output_file_path)
     assetfinder_runner(tool_output_file_path, domain_name, output_file_path)
     sorter(output_file_path, current_path, domain_name)
-    find_alive(current_path, domain_name)
+    filename = find_alive(current_path, domain_name)
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Perform operations on a given domain name.')
-    parser.add_argument('domain', type=str, help='The domain name to perform operations on')
-    args = parser.parse_args()
-    main(args)
+    return filename

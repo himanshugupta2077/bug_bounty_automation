@@ -24,32 +24,22 @@ def parse_single_target(target):
     result = extract_after_asterisk_dot(target)
 
     if result:
-        target = [result]
-        # print(f"\n{blueinfo} target provided\n")
-        # print(f"{target}")
-        # print("start analysis with subdomain enum")
-        # line()
-        target_info_string = f"Target: {target}\nStart Subdomain Enum\n"
-        return target, target_info_string
+        target = [target]
+        # target = [result]
+        target_type = 0
+        return target, target_type
 
     else:
+        target_type = 1
         target = [target]
-        # print(f"\n{blueinfo} target provided\n")
-        # print(f"{target}")
-        # print("start analysis without subdomain enum")
-        # line()
-        target_info_string = f"Target: {target}\nStart analysis and skip Subdomain Enum\n"
-        return target, target_info_string
+        return target, target_type
 
 def parse_multiple_targets(filename):
     with open(filename, "r") as file:
         targets = file.read().splitlines()
-    # print(f"\n{blueinfo} target provided\n")
-    # print(f"{targets}")
-    # print("start analysis without subdomain enum")
-    # line()
-    target_info_string = f"\nStart analysis and skip Subdomain Enum\n"
-    return targets, target_info_string
+
+    target_type = 2
+    return targets, target_type
 
 def extract_after_asterisk_dot(target):
     # Find the index of the first occurrence of "*." in the input string
@@ -81,9 +71,9 @@ def main():
         return
 
     if args.target:
-        target, target_info_string = parse_single_target(args.target)
+        target, target_type = parse_single_target(args.target)
     elif args.file:
-        target, target_info_string = parse_multiple_targets(args.file)
+        target, target_type = parse_multiple_targets(args.file)
     else:
         print(f"\n{redexclaim} Error: No target given. Please provide a target.")
         print("\nusage: main.py [-h] [-t TARGET] [-f FILE]")
@@ -95,4 +85,4 @@ options:
   -f FILE, --file FILE  Specify a text file with multiple targets\n""")
         sys.exit()
 
-    return target, target_info_string
+    return target, target_type

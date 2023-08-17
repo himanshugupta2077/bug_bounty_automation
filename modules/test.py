@@ -1,20 +1,39 @@
-def extract_after_asterisk_dot(target):
-    # Find the index of the first occurrence of "*." in the input string
-    asterisk_dot_index = target.find("*.")
+import subprocess
+import os
+
+def check_subscraper_installed():
+    try:
+        # Check if subscraper is available by running "subscraper -h"
+        subprocess.run(['subscraper', '-h'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        return True
+    except FileNotFoundError:
+        return False
+
+print("Checking if subscraper is installed...")
+
+if not check_subscraper_installed():
+    print("subscraper is not installed. Installing...")
     
-    # Check if "*." is present in the input string
-    if asterisk_dot_index != -1:
-        # Extract the substring after "*."
-        result_string = target[asterisk_dot_index + 2:]
-        return result_string
-    else:
-        return None  # Return None if "*." is not found in the input string
+    try:
+        # Clone the subscraper repository
+        subprocess.run(['git', 'clone', 'https://github.com/m8sec/subscraper'], check=True)
 
-# Test the function with a sample input
-target = input("Enter a string: ")
-result = extract_after_asterisk_dot(target)
+        cwd = os.getcwd()  # Get the current working directory
+        print("Current Working Directory:", cwd)
 
-if result:
-    print(f"Substring after '*.' is: {result}")
+        # Change directory to subscraper
+        os.chdir("subscraper")
+
+        cwd = os.getcwd()  # Get the current working directory
+        print("Current Working Directory:", cwd)
+
+        # Build the Docker image
+        subprocess.run(['sudo', 'docker', 'build', '-t', 'm8sec/subscraper', '.'], check=True)
+        
+        print("subscraper installed successfully.")
+    except subprocess.CalledProcessError as e:
+        print("Error during installation:", e)
 else:
-    print("The input string does not contain '*.'")
+    print("subscraper is already installed and available.")
+
+

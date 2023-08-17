@@ -20,38 +20,54 @@ redstar = f"{Fore.RED}[*]{Style.RESET_ALL}"
 def line():
 	print("\n----------------------------------------------------------------------------------------------------------------")
 
-def main(db, target):
+def main(db, target, target_type, filename):
 	# creating collection for storing target info
-	target_info_collection = db['target_info']
+	target_col = db['target_col']
 
 	# run dig tool
 	records_from_dig, ipv4_from_dig = run_dig_mod.main(target[0])
 
 	# Get the current date and time
 	current_datetime = datetime.now()
-
-	# Format the date and time in the desired format
 	time_date = current_datetime.strftime("%b-%d-%Y_%H:%M:%S")
 
-	target_name_document = {
-			'target':target
-	}
+	target_lvl_1 = []
 
-	target_ipv4_document = {
-			'target_ipv4_dig':ipv4_from_dig
-	}
+	if target_type == 0:
+		# Open the input file in read mode
+		with open(filename, 'r') as file:
+			# Read each line from the file and add it to the list
+			for line in file:
+				target_lvl_1.append(line.strip())  # Remove leading/trailing whitespace
 
-	last_updated_document = {
-			'last_updated':time_date
-	}
+		target_doc = {
+			'target_lvl_0': target,
+			'target_type':target_type,
+			'created_on': time_date,
+			'target_lvl_1': [{'target': item} for item in target_lvl_1]
+		}
 
-	# storing data in target_info_collection
-	target_info_collection.insert_one(target_name_document)
-	target_info_collection.insert_one(target_ipv4_document)
-	target_info_collection.insert_one(last_updated_document)
+	elif target_type == 1:
+		target_doc = {
+			'target_lvl_0': target[0],
+			'target_type':target_type,
+			'created_on': time_date,
+			'target_lvl_1': target[0]
+		}
+
+	elif target_type == 2:
+		target_doc = {
+			'target_lvl_0': target,
+			'target_type':target_type,
+			'created_on': time_date,
+			'target_lvl_1': [{'target': item} for item in target]
+		}
+
+	# storing data in target_col
+	target_col.insert_one(target_doc)
 
 	projection = {'_id': 0, 'target': 1, 'target_ipv4_dig': 1, 'last_updated': 1}
-	documents = target_info_collection.find({}, projection)
+	documents = target_col.find({})
 
 	# Print the specified fields for each document
 	for document in documents:
